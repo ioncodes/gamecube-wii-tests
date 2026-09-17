@@ -15,6 +15,8 @@ Found in:
 * Mario Golf: Toadstool Tour
 * Mario Power Tennis (the Plaza map)
 
+Expected:
+
 - **Left (Z-freeze off):** solid blue rectangle.
 - **Right (Z-freeze on):** blue rectangle with a red rectangle visible inside it.
 
