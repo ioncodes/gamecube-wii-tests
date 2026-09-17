@@ -24,7 +24,7 @@ If both sides are solid blue, Z-freeze is broken or not implemented.
 
 ![](z-freeze/expected.png)
 
-[FIFO capture](z-freeze/z-freeze-test.dff)
+[FIFO capture](z-freeze/z-freeze.dff)
 
 ## Vertex-skip
 
