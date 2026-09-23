@@ -14,7 +14,7 @@ all $(TESTS):
 else
 include $(DEVKITPPC)/gamecube_rules
 
-CFLAGS := -std=gnu11 -O2 -g -Wall -Wextra -Werror $(MACHDEP) -I$(LIBOGC_INC)
+CFLAGS := -std=gnu11 -Og -g -Wall -Wextra -Werror $(MACHDEP) -I$(LIBOGC_INC)
 LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(@:.elf=.map)
 LIBPATHS := -L$(LIBOGC_LIB)
 LIBS := -logc -lm

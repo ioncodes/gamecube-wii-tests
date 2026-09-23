@@ -19,26 +19,47 @@ static void quad(f32 x, f32 y, f32 w, f32 h, f32 depth, GXColor color) {
     GX_End();
 }
 
-static void panel(f32 x, u8 freeze) {
+static void panel(f32 x, f32 y, bool freeze, int reference_topology,
+                  float hslope, float vslope) {
     GX_SetCoPlanar(GX_DISABLE);
     GX_SetZMode(GX_ENABLE, GX_LEQUAL, GX_TRUE);
     GX_SetColorUpdate(GX_TRUE);
 
-    quad(x + 60, 180, 140, 120, 0.5f, red);
+    quad(x + 40, y + 30, 80, 60, 0.5f, red);
 
     GX_SetColorUpdate(GX_FALSE);
     GX_SetZMode(GX_ENABLE, GX_ALWAYS, GX_FALSE);
-    GX_Begin(GX_TRIANGLES, GX_VTXFMT0, 3);
-    vertex(x + 8, 128, 0.75f, red);
-    vertex(x + 16, 128, 0.75f, red);
-    vertex(x + 8, 136, 0.75f, red);
-    GX_End();
+
+    f32 slope = hslope == 0.0 && vslope == 0.0 ? 0.75 : 0.25;
+
+    switch (reference_topology) {
+        case GX_TRIANGLES:
+        case GX_TRIANGLESTRIP:
+        case GX_TRIANGLEFAN: {
+            GX_Begin(reference_topology, GX_VTXFMT0, 3);
+            vertex(x + 8, 128, slope, red);
+            vertex(x + 16, 128, slope + hslope, red);
+            vertex(x + 8, 136, slope + vslope, red);
+            GX_End();
+            break;
+        }
+        case GX_QUADS: {
+            GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+            vertex(x + 8, 128, slope, red);
+            vertex(x + 16, 128, slope + hslope, red);
+            vertex(x + 8, 136, slope + vslope, red);
+            vertex(x + 16, 136, slope + hslope + vslope, red);
+            GX_End();
+            break;
+        }
+    }
+
     GX_SetCoPlanar(freeze);
 
     GX_SetColorUpdate(GX_TRUE);
     GX_SetZMode(GX_ENABLE, GX_LEQUAL, GX_TRUE);
 
-    quad(x, 120, 260, 240, 0.25f, blue);
+    quad(x, y, 160, 120, 0.25f, blue);
     GX_SetCoPlanar(GX_DISABLE);
 }
 
@@ -86,6 +107,7 @@ int main(void) {
     GX_ClearVtxDesc();
     GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
     GX_SetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
     GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GX_SetNumChans(1);
@@ -114,8 +136,25 @@ int main(void) {
         PAD_ScanPads();
         if (PAD_ButtonsDown(0) & PAD_BUTTON_START) break;
 
-        panel(40, GX_DISABLE);
-        panel(340, GX_ENABLE);
+        // test zfreeze disabled.
+        panel(40, 30, GX_DISABLE, GX_TRIANGLES, 0.0, 0.0);
+        // test with non slopped reference triangle.
+        panel(240, 30, GX_ENABLE, GX_TRIANGLES, 0.0, 0.0);
+        // test with non slopped reference quad.
+        panel(440, 30, GX_ENABLE, GX_QUADS, 0.0, 0.0);
+        // test with non slopped reference fan.
+        panel(40, 180, GX_ENABLE, GX_TRIANGLEFAN, 0.0, 0.0);
+        // test with non slopped reference strip.
+        panel(240, 180, GX_ENABLE, GX_TRIANGLESTRIP, 0.0, 0.0);
+        // test with horizontally slopped reference triangle.
+        panel(440, 180, GX_ENABLE, GX_TRIANGLES, 0.5, 0.0);
+        // test with vertically slopped reference triangle.
+        panel(40, 330, GX_ENABLE, GX_TRIANGLES, 0.0, 0.5);
+        // test with horizontally slopped reference quad.
+        panel(240, 330, GX_ENABLE, GX_QUADS, 0.5, 0.0);
+        // test with vertically slopped reference quad.
+        panel(440, 330, GX_ENABLE, GX_QUADS, 0.0, 0.5);
+
         GX_CopyDisp(xfb[next], GX_TRUE);
         GX_DrawDone();
         VIDEO_SetNextFramebuffer(xfb[next]);
