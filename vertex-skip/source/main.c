@@ -26,7 +26,7 @@ static void panel(f32 x, u8 mode) {
     for (unsigned i = 0; i < 5; ++i) {
         const u16 index = indices[i];
         const int skip = index == 0xffff;
-        
+
         if (mode == GX_DIRECT) {
             if (skip) continue;
 

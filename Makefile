@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := all
-TESTS := z-freeze vertex-skip
-BUILD := build
+TESTS := z-freeze vertex-skip z-freeze-depth
+PLATFORM ?= gamecube
+BUILD := $(if $(filter wii,$(PLATFORM)),build/wii,build)
 
 .PHONY: all clean $(TESTS)
 clean:
@@ -10,9 +11,9 @@ ifeq ($(strip $(DEVKITPPC)),)
 DEVKIT_IMAGE ?= devkitpro/devkitppc:latest
 all $(TESTS):
 	docker run --rm --user "$$(id -u):$$(id -g)" \
-		-v "$(CURDIR):/work:Z" -w /work $(DEVKIT_IMAGE) make $@
+		-v "$(CURDIR):/work:Z" -w /work $(DEVKIT_IMAGE) make PLATFORM=$(PLATFORM) $@
 else
-include $(DEVKITPPC)/gamecube_rules
+include $(DEVKITPPC)/$(PLATFORM)_rules
 
 CFLAGS := -std=gnu11 -Og -g -Wall -Wextra -Werror $(MACHDEP) -I$(LIBOGC_INC)
 LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(@:.elf=.map)
