@@ -1,6 +1,9 @@
 .DEFAULT_GOAL := all
 TESTS := z-freeze vertex-skip z-freeze-depth
 PLATFORM ?= gamecube
+ifeq ($(PLATFORM),wii)
+TESTS += ipc-flags
+endif
 BUILD := $(if $(filter wii,$(PLATFORM)),build/wii,build)
 
 .PHONY: all clean $(TESTS)
@@ -20,6 +23,8 @@ LDFLAGS = -g $(MACHDEP) -Wl,-Map,$(@:.elf=.map)
 LIBPATHS := -L$(LIBOGC_LIB)
 LIBS := -logc -lm
 LD := $(CC)
+
+$(BUILD)/ipc-flags.elf: LIBS := -lfat -logc -lm
 
 all: $(TESTS)
 $(TESTS): %: $(BUILD)/%.dol

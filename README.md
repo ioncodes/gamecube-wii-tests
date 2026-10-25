@@ -11,6 +11,20 @@ The Makefile uses devkitPPC/libogc when `DEVKITPPC` and `DEVKITPRO` are configur
 Otherwise it runs the build through Docker using `devkitpro/devkitppc:latest`.
 GameCube DOLs are written to `build/` and Wii DOLs to `build/wii/`.
 
+## IPC flags (Wii)
+
+Each sample sets X2 or X1, reads `PPCCTRL`, does a second write and reads
+`PPCCTRL` again. The zero case writes zero to `PPCCTRL`. The control case
+writes to `PPCMSG` instead: zero for X2, the same request pointer for X1.
+Both cases are sampled 256 times in alternating order.
+
+X1 trials submit an invalid command and wait for its reply. libogc's IPC
+handler is disabled while measuring and the test stops if an IPC check
+fails.
+
+[Wii results](ipc-flags/hardware-wii.txt) (IOS58 r6176): X1 and X2 stay set
+in every trial. Writing zero to `PPCCTRL` clears neither flag.
+
 ## Z-freeze
 
 Found in:

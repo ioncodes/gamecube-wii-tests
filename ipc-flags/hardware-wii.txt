@@ -1,0 +1,7 @@
+IOS58 r6176
+
+Flag/case     N  1->1  1->0  0->0  0->1  TB ticks
+X2 control 256   256     0     0     0  13-15
+X2 zero    256   256     0     0     0  13-14
+X1 control 256   256     0     0     0  13-15
+X1 zero    256   256     0     0     0  14-15
